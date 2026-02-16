@@ -1,0 +1,62 @@
+code: |-
+  ;(coin.create-account "allocation00" (read-keyset 'ks-alloc0))
+  ;(coin.create-account "allocation01" (read-keyset 'ks-alloc1))
+  (coin.release-allocation "allocation00")
+  (coin.release-allocation "allocation01")
+
+  (coin.create-account "k:{{chain-funder-key}}" (read-keyset 'ks-chain-funder))
+  (coin.transfer "allocation00" "k:{{chain-funder-key}}" 1000000.0)
+  (coin.transfer "allocation01" "k:{{chain-funder-key}}" 1000000.0)
+
+
+
+data:
+  ks-chain-funder:
+    pred: keys-all
+    keys:
+      - {{chain-funder-key}}
+
+
+
+meta:
+  chainId: "0"
+  sender: {{sender}}
+  gasLimit: 5000
+  gasPrice: 0.00000001
+  ttl: 7200
+
+networkId: {{network}}
+
+signers:
+  - public: {{sender-key}}
+    caps:
+      - name: "coin.GAS"
+        args: []
+
+  - public: {{allocation00-key}}
+    caps:
+      - name: coin.RELEASE_ALLOCATION
+        args:
+          - allocation00
+          - 1000000.0
+
+      - name: coin.TRANSFER
+        args:
+          - allocation00
+          - k:{{chain-funder-key}}
+          - 1000000.0
+
+  - public: {{allocation01-key}}
+    caps:
+      - name: coin.RELEASE_ALLOCATION
+        args:
+          - allocation01
+          - 1000000.0
+
+      - name: coin.TRANSFER
+        args:
+          - allocation01
+          - k:{{chain-funder-key}}
+          - 1000000.0
+
+type: exec

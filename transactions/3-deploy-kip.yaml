@@ -1,0 +1,64 @@
+code: |-
+  (namespace 'user)
+  (define-keyset "user.kip-admin" (read-keyset "kip-ks"))
+
+  (namespace "")
+  (ns.write-registry  "kip" (read-keyset "kip-ks") true)
+  (define-namespace "kip" (read-keyset "kip-ks") (read-keyset "kip-ks"))
+  (define-namespace "kip" (keyset-ref-guard "user.kip-admin") (keyset-ref-guard "user.kip-admin"))
+
+
+  (namespace "kip")
+  (interface account-protocols-v1
+
+    " Define a standard for support of Kadena Account Protocols, \
+    \ which reserve account names starting with 'X:'' where X is a \
+    \ single latin-1 character. It also indicates which protocols are \
+    \ supported."
+
+    (defconst SINGLE_KEY "k:"
+      " Protocol in which the data portion of the name must match the \
+      \ key in a single-key, 'keys-all' guard."
+    )
+
+    (defun enforce-reserved:bool
+      ( account:string
+        guard:guard
+      )
+      @doc " Enforce reserved account name protocols. Implementations \
+           \ must call this function in all account creation modes \
+           \ (transfer-create, create-account, etc)."
+    )
+
+  )
+
+
+data:
+  kip-ks:
+    pred: keys-any
+    keys:
+      - {{kip-key-1}}
+      - {{kip-key-2}}
+meta:
+  chainId: "{{chain}}"
+  sender: {{sender}}
+  gasLimit: 150000
+  gasPrice: 0.00000001
+  ttl: 7200
+
+networkId: {{network}}
+
+signers:
+  - public: {{sender-key}}
+    caps:
+      - name: "coin.GAS"
+        args: []
+
+  - public: {{kip-key-1}}
+    caps: []
+
+  - public: {{ns-key-1}}
+    caps:
+      - name: ns.OPERATE
+        args: []
+type: exec

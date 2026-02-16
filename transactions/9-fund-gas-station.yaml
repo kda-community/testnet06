@@ -1,0 +1,34 @@
+code: |-
+
+  (coin.transfer "k:{{chain-funder-key}}" "{{x-chain-gas-station}}" 20.0)
+
+data:
+  faucet-ks:
+    pred: keys-any
+    keys:
+      - {{faucet-key}}
+  coin-faucet-namespace: faucet
+
+meta:
+  chainId: "{{chain}}"
+  sender: {{sender}}
+  gasLimit: 150000
+  gasPrice: 0.00000001
+  ttl: 7200
+
+networkId: {{network}}
+
+signers:
+  - public: {{sender-key}}
+    caps:
+      - name: "coin.GAS"
+        args: []
+
+  - public: {{chain-funder-key}}
+    caps:
+      - name: coin.TRANSFER
+        args:
+          - k:{{chain-funder-key}}
+          - "{{x-chain-gas-station}}"
+          - 20.0
+type: exec

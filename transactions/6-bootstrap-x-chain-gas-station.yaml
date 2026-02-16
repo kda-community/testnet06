@@ -1,0 +1,43 @@
+code: |-
+  (namespace "user")
+  (define-keyset "user.gas-station-admin" (read-keyset "ks-gas-station"))
+  (namespace "")
+  (coin.create-account "{{x-chain-gas-station}}"
+                       (util.guards.guard-or (keyset-ref-guard "user.gas-station-admin")
+                                              (util.guards1.guard-all [ (create-user-guard (util.guards1.enforce-below-or-at-gas-limit 850))
+                                                                      , (create-user-guard (util.guards1.enforce-below-or-at-gas-price 0.00000001))
+                                                                      , (create-user-guard (coin.gas-only))
+                                                                       ])
+                        ))
+  (coin.transfer "{{sender}}" "{{x-chain-gas-station}}" 0.1)
+
+
+data:
+  ks-gas-station:
+    pred: keys-any
+    keys:
+      - {{gas-station-key}}
+
+meta:
+  chainId: "{{chain}}"
+  sender: {{sender}}
+  gasLimit: 1500
+  gasPrice: 0.00000001
+  ttl: 7200
+
+networkId: {{network}}
+
+signers:
+  - public: {{sender-key}}
+    caps:
+      - name: coin.GAS
+        args: []
+
+      - name: "coin.TRANSFER"
+        args:
+          - {{sender}}
+          - {{x-chain-gas-station}}
+          - 0.1
+
+
+type: exec
